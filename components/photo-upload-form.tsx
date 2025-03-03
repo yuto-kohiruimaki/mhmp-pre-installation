@@ -215,7 +215,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
             </>
           ) : (
             <>
-              次へ <ChevronRight className="ml-2 h-4 w-4" />
+              アップロードして次へ <ChevronRight className="ml-2 h-4 w-4" />
             </>
           )}
         </Button>
