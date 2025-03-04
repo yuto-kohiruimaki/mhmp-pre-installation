@@ -75,6 +75,10 @@ const documentLabels: Record<string, string> = {
   other: "その他書類",
 }
 
+console.log("BUCKET_NAME:", process.env.BUCKET_NAME)
+console.log("REGION:", process.env.REGION)
+
+
 export async function appendToSheet(formData: FormData) {
   try {
     // Initialize auth
