@@ -122,8 +122,8 @@ export async function appendToSheet(formData: FormData) {
     const photoUrls = formData.photoUrls ? (JSON.parse(formData.photoUrls) as Record<string, string>) : {}
 
     // S3のURLを「https://bucket-name/店舗名/ファイル」の形式に変換
-    const bucketName = process.env.AWS_BUCKET_NAME
-    const region = process.env.AWS_REGION
+    const bucketName = process.env.BUCKET_NAME
+    const region = process.env.REGION
     const s3BaseUrl = `https://${bucketName}.s3.${region}.amazonaws.com`
 
     // 各写真のフルURLを生成
