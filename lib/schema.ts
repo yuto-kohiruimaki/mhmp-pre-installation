@@ -48,7 +48,7 @@ export const constructionFormSchema = z.object({
 export const facilityAccessFormSchema = z.object({
   entryProcedures: z.string().min(1, { message: "入館時の遵守事項を入力してください" }),
   loadingProcedures: z.string().min(1, { message: "荷捌き上の遵守事項を入力してください" }),
-  facilityDocument: z.instanceof(File).optional(),
+  facilityDocument: z.any().optional(), // `File` の代わりに `any` を使用
 })
 
 export const workDetailsFormSchema = z.object({
