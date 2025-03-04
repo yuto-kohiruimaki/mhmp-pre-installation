@@ -480,7 +480,7 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
                 </>
               ) : (
                 <>
-                  画像をアップロードして次へ
+                    ファイルをアップロードして次へ
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </>
               )}
