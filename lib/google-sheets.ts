@@ -18,11 +18,12 @@ const QUESTIONS = [
   // 工事申請情報
   "作業不可日の有無",
   "営業時間中の工事作業の可否",
+  "営業時間中の工事作業の可否（その他詳細）", // その他の詳細を追加
   "工事するまでの要な書類",
   "申請の提出方法",
   "FAX番号",
   "メールアドレス",
-  "その他提出方法詳細",
+  "その他提出方法詳細", // その他の詳細
   // 作業申請の際のお約束を2つに分割
   "施設所定のイントラなどの場合の必要項目",
   "作業申請の締め切り",
@@ -32,6 +33,7 @@ const QUESTIONS = [
   "入館説明用資料",
   // 作業詳細情報
   "作業員の車両駐車について",
+  "作業員の車両駐車について（その他詳細）", // その他の詳細を追加
   "夜間の作業時間に制限があるか",
   "制限の詳細",
   "営業時間外（夜間作業）時に自動消灯されるか",
@@ -158,31 +160,33 @@ export async function appendToSheet(formData: FormData) {
       [QUESTIONS[12]]: formData.constructionPossibility
         ? constructionPossibilityLabels[formData.constructionPossibility]
         : "-",
-      [QUESTIONS[13]]: formData.requiredDocuments ? JSON.stringify(formData.requiredDocuments) : "-",
-      [QUESTIONS[14]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
-      [QUESTIONS[15]]: formData.faxNumber || "-",
-      [QUESTIONS[16]]: formData.emailAddress || "-",
-      [QUESTIONS[17]]: formData.otherSubmissionDetails || "-",
+      [QUESTIONS[13]]: formData.constructionPossibilityOther || "-", // その他の詳細
+      [QUESTIONS[14]]: formData.requiredDocuments ? JSON.stringify(formData.requiredDocuments) : "-",
+      [QUESTIONS[15]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
+      [QUESTIONS[16]]: formData.faxNumber || "-",
+      [QUESTIONS[17]]: formData.emailAddress || "-",
+      [QUESTIONS[18]]: formData.otherSubmissionDetails || "-", // その他の詳細
       // 作業申請の際のお約束を2つに分割
-      [QUESTIONS[18]]: formData.requiredItems || "-",
-      [QUESTIONS[19]]: formData.applicationDeadline || "-",
-      [QUESTIONS[20]]: JSON.stringify(constructionDocumentUrls) || "-",
-      [QUESTIONS[21]]: formData.entryProcedures || "-",
-      [QUESTIONS[22]]: formData.loadingProcedures || "-",
-      [QUESTIONS[23]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
+      [QUESTIONS[19]]: formData.requiredItems || "-",
+      [QUESTIONS[20]]: formData.applicationDeadline || "-",
+      [QUESTIONS[21]]: JSON.stringify(constructionDocumentUrls) || "-",
+      [QUESTIONS[22]]: formData.entryProcedures || "-",
+      [QUESTIONS[23]]: formData.loadingProcedures || "-",
+      [QUESTIONS[24]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
       // 作業詳細情報
-      [QUESTIONS[24]]: formData.parkingOption
+      [QUESTIONS[25]]: formData.parkingOption
         ? parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption
         : "-",
-      [QUESTIONS[25]]:
-        formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
-      [QUESTIONS[26]]: formData.restrictionDetails || "-",
+      [QUESTIONS[26]]: formData.parkingOptionOther || "-", // その他の詳細
       [QUESTIONS[27]]:
+        formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
+      [QUESTIONS[28]]: formData.restrictionDetails || "-",
+      [QUESTIONS[29]]:
         formData.autoLightOff === "yes" ? "自動消灯" : formData.autoLightOff === "no" ? "自動消灯なし" : "-",
-      [QUESTIONS[28]]: formData.lightOffDetails || "-",
-      [QUESTIONS[29]]: formData.backyardKeyManagement || "-",
-      [QUESTIONS[30]]: formData.serverRackKeyManagement || "-",
-      [QUESTIONS[31]]: formData.otherConsiderations || "-",
+      [QUESTIONS[30]]: formData.lightOffDetails || "-",
+      [QUESTIONS[31]]: formData.backyardKeyManagement || "-",
+      [QUESTIONS[32]]: formData.serverRackKeyManagement || "-",
+      [QUESTIONS[33]]: formData.otherConsiderations || "-",
     }
 
     // Add the new row

@@ -8,7 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, ChevronRight, Upload, Loader2 } from "lucide-react"
+import { ArrowLeft, ChevronRight, Upload, Loader2, Trash2 } from "lucide-react"
 import { facilityAccessFormSchema, type FacilityAccessFormValues } from "@/lib/schema"
 import { useState } from "react"
 import { getPresignedUrl } from "@/app/actions"
@@ -142,16 +142,29 @@ export function FacilityAccessForm({ onNext, onBack, defaultValues, storeName }:
                 なければ、添付なしで次の項目に移っていただいて結構です。
               </FormDescription>
               <div className="mt-2">
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50">
-                  <Upload className="h-4 w-4" />
-                  ファイルを選択
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                  />
-                </label>
+                <div className="flex gap-2">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50">
+                    <Upload className="h-4 w-4" />
+                    ファイルを選択
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={handleFileChange}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                    />
+                  </label>
+                  {selectedFile && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => setSelectedFile(null)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="ml-2">クリア</span>
+                    </Button>
+                  )}
+                </div>
                 {selectedFile && <p className="mt-2 text-sm text-muted-foreground">選択済み: {selectedFile.name}</p>}
               </div>
             </div>
@@ -162,9 +175,6 @@ export function FacilityAccessForm({ onNext, onBack, defaultValues, storeName }:
               </div>
             )}
           </CardContent>
-          <FormDescription>
-            <div className="text-right mr-5 mt-10">※画像を選択している場合、次へを押すと画像が自動アップロードされます。</div>
-          </FormDescription>
           <CardFooter className="flex justify-between border-t p-4">
             <Button variant="outline" onClick={onBack} disabled={isUploading}>
               <ArrowLeft className="mr-2 h-4 w-4" />

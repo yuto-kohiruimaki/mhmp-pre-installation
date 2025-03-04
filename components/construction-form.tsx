@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, ChevronRight, Upload, Loader2 } from "lucide-react"
+import { ArrowLeft, ChevronRight, Upload, Loader2, Trash2 } from "lucide-react"
 import { constructionFormSchema, type ConstructionFormValues } from "@/lib/schema"
 import { useState } from "react"
 import Image from "next/image"
@@ -292,11 +292,35 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
                       />
                     </div>
                   )}
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50">
-                    <Upload className="h-4 w-4" />
-                    ファイルを選択
-                    <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange(doc.id)} />
-                  </label>
+                  <div className="flex gap-2">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50">
+                      <Upload className="h-4 w-4" />
+                      ファイルを選択
+                      <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange(doc.id)} />
+                    </label>
+                    {documents[doc.id] && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          setDocuments((prev) => {
+                            const newDocs = { ...prev }
+                            delete newDocs[doc.id]
+                            return newDocs
+                          })
+                          setDocumentPreviews((prev) => {
+                            const newPreviews = { ...prev }
+                            delete newPreviews[doc.id]
+                            return newPreviews
+                          })
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="ml-2">クリア</span>
+                      </Button>
+                    )}
+                  </div>
                   {documents[doc.id] && (
                     <p className="mt-2 text-sm text-muted-foreground">選択済み: {documents[doc.id].name}</p>
                   )}
