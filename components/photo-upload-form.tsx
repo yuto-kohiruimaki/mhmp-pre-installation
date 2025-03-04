@@ -56,7 +56,7 @@ const REQUIRED_PHOTOS: PhotoUpload[] = [
   {
     id: "backyard",
     title: "工事場所の写真撮影（バックヤード全体）",
-    description: "できる限りサーバーラックやが電器が映るように撮影をお願いいたします。",
+    description: "できる限りサーバーラックや電器が映るように撮影をお願いいたします。",
     file: null,
     preview: null,
   },
