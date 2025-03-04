@@ -1,8 +1,14 @@
 import * as z from "zod"
 
+// 電話番号とFAX番号のバリデーションパターンを追加
+const PHONE_PATTERN = /^[0-9-]+$/
+
 export const initialFormSchema = z.object({
   storeName: z.string().min(1, { message: "店舗名を入力してください" }),
-  phoneNumber: z.string().min(1, { message: "電話番号を入力してください" }),
+  phoneNumber: z
+    .string()
+    .min(1, { message: "電話番号を入力してください" })
+    .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
   needsDirectCommunication: z.enum(["yes", "no"], {
     required_error: "選択してください",
   }),
@@ -10,7 +16,10 @@ export const initialFormSchema = z.object({
 
 export const facilityManagerFormSchema = z.object({
   managerName: z.string().min(1, { message: "担当者様のお名前を入力してください" }),
-  managerPhone: z.string().min(1, { message: "電話番号を入力してください" }),
+  managerPhone: z
+    .string()
+    .min(1, { message: "電話番号を入力してください" })
+    .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
 })
 
 export const constructionFormSchema = z.object({
@@ -23,7 +32,12 @@ export const constructionFormSchema = z.object({
   submissionMethod: z.enum(["fax", "email", "other"], {
     required_error: "選択してください",
   }),
-  faxNumber: z.string().optional(),
+  faxNumber: z
+    .string()
+    .optional()
+    .refine((val) => !val || PHONE_PATTERN.test(val), {
+      message: "FAX番号は数字とハイフンのみ入力可能です",
+    }),
   emailAddress: z.string().email({ message: "有効なメールアドレスを入力してください" }).optional(),
   otherSubmissionDetails: z.string().optional(),
   // 作業申請の際のお約束を2つに分割

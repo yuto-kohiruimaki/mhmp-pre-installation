@@ -68,6 +68,13 @@ const parkingOptionLabels: Record<string, string> = {
   other: "その他",
 }
 
+const documentLabels: Record<string, string> = {
+  construction: "工事作業申請書",
+  fire: "夜間警備申請書",
+  facility: "高所作業申請書",
+  other: "その他書類",
+}
+
 export async function appendToSheet(formData: FormData) {
   try {
     // Initialize auth
@@ -82,7 +89,6 @@ export async function appendToSheet(formData: FormData) {
     await doc.loadInfo()
     const sheet = doc.sheetsByIndex[0]
 
-    // シートのサイズを確認し、必要に応じてリサイズ
     const requiredColumns = QUESTIONS.length
     if (sheet.columnCount < requiredColumns) {
       console.log(`Resizing sheet from ${sheet.columnCount} to ${requiredColumns} columns`)
@@ -161,7 +167,9 @@ export async function appendToSheet(formData: FormData) {
         ? constructionPossibilityLabels[formData.constructionPossibility]
         : "-",
       [QUESTIONS[13]]: formData.constructionPossibilityOther || "-", // その他の詳細
-      [QUESTIONS[14]]: formData.requiredDocuments ? JSON.stringify(formData.requiredDocuments) : "-",
+      [QUESTIONS[14]]: formData.requiredDocuments
+        ? JSON.stringify(formData.requiredDocuments.map((doc) => documentLabels[doc] || doc))
+        : "-",
       [QUESTIONS[15]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
       [QUESTIONS[16]]: formData.faxNumber || "-",
       [QUESTIONS[17]]: formData.emailAddress || "-",

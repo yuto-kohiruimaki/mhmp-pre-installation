@@ -59,12 +59,20 @@ export function FacilityManagerForm({ defaultValues, onSubmit, onBack }: Facilit
                 name="managerPhone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">施設のご担当者様の電話番号</FormLabel>
+                    <FormLabel className="text-base font-medium">施設のご担当者様の電話番号 (ハイフンなしでご入力ください。)</FormLabel>
                     <FormDescription className="text-sm text-muted-foreground">
-                      工事作業届け、申請等でやりとりさせていただく方のご連絡先をお願いします。①の店舗のご担当者様経由で申請等対応いただける場合は、省略ください。
+                      工事作業届、申請等でやりとりさせていただく方のご連絡先をお願いします。①の店舗のご担当者様経由で申請等対応いただける場合は、省略ください。
                     </FormDescription>
                     <FormControl>
-                      <Input placeholder="回答を入力" {...field} />
+                      <Input
+                        placeholder="例: 0312345678"
+                        {...field}
+                        onChange={(e) => {
+                          // 数字とハイフン以外の文字を除去
+                          const value = e.target.value.replace(/[^0-9-]/g, "")
+                          field.onChange(value)
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

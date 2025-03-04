@@ -20,8 +20,8 @@ import { getPresignedUrl } from "@/app/actions"
 // 書類タイプのマッピング
 const DOCUMENT_TYPES = {
   construction: "工事作業申請書",
-  fire: "消防作業申請書",
-  facility: "設備管理申請書",
+  fire: "夜間警備申請書",
+  facility: "高所作業申請書",
   other: "その他書類",
 } as const
 
@@ -32,11 +32,11 @@ const requiredDocuments = [
   },
   {
     id: "fire",
-    label: "消防作業申請書",
+    label: "夜間警備申請書",
   },
   {
     id: "facility",
-    label: "設備管理申請書",
+    label: "高所作業申請書",
   },
   {
     id: "other",
@@ -244,7 +244,7 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
               render={() => (
                 <FormItem>
                   <FormLabel className="text-base font-medium">
-                    工事するまでの要な書類 <span className="text-red-500">*</span>
+                    工事する上で必要な書類 <span className="text-red-500">*</span>
                   </FormLabel>
                   <div className="space-y-2">
                     {requiredDocuments.map((document) => (
@@ -373,9 +373,17 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
                 name="faxNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">FAXの場合、番号の記入</FormLabel>
+                    <FormLabel className="text-base font-medium">FAXの場合、番号の記入 (ハイフンなしでご入力ください。)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="例: 03-1234-5678" />
+                      <Input
+                        {...field}
+                        placeholder="例: 0312345678"
+                        onChange={(e) => {
+                          // 数字とハイフン以外の文字を除去
+                          const value = e.target.value.replace(/[^0-9-]/g, "")
+                          field.onChange(value)
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -480,7 +488,7 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
                 </>
               ) : (
                 <>
-                    ファイルをアップロードして次へ
+                  ファイルをアップロードして次へ
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </>
               )}

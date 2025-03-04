@@ -59,10 +59,18 @@ export function InitialForm({ defaultValues, onSubmit }: InitialFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium">
-                      店舗電話番号 (ハイフンなしでご入力ください。)<span className="text-red-500">*</span>
+                      店舗電話番号 (ハイフンなしでご入力ください。) <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="例: 0312345678" {...field} />
+                      <Input
+                        placeholder="例: 0312345678"
+                        {...field}
+                        onChange={(e) => {
+                          // 数字とハイフン以外の文字を除去
+                          const value = e.target.value.replace(/[^0-9-]/g, "")
+                          field.onChange(value)
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,10 +112,7 @@ export function InitialForm({ defaultValues, onSubmit }: InitialFormProps) {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between border-t p-4">
-            <Button variant="outline" type="button" onClick={() => form.reset()}>
-              クリア
-            </Button>
+          <CardFooter className="flex justify-end border-t p-4">
             <Button type="submit">
               次へ <ChevronRight className="ml-2 h-4 w-4" />
             </Button>

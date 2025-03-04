@@ -23,8 +23,8 @@ const FILE_NAMES = {
   server: "サーバーラック内",
   // 工事書類
   construction: "工事作業申請書",
-  fire: "消防作業申請書",
-  facility: "設備管理申請書",
+  fire: "夜間警備申請書",
+  facility: "高所作業申請書",
   other: "その他書類",
   // 入館説明用資���
   facility_document: "入館説明用の添付ファイル",

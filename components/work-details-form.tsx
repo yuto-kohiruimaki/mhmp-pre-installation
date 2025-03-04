@@ -255,11 +255,11 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
                 <FormItem>
                   <FormLabel className="text-base font-medium">その他留意事項</FormLabel>
                   <FormDescription>
-                    予めお伝えしておく必要があることがあれば、ご教示ください。
-                    例）・天井裏配線など、、相当に大掛な時間がかかる可能性がある
-                    　　・高所作業の場合は、資格の提示が必要
-                    　　・割高でべらぼうな作業がある場合、アスベストの調査等も必要となる
-                    　　・駐車場から荷物まで大変遠距離がある
+                  予めお伝えしておく必要があることがあれば、ご教示ください。<br />
+                  例）・天井裏配線だと、申請に大幅な時間がかかる可能性がある<br />
+                  　  ・高所作業の場合は、資格の提示が必要<br />
+                  　  ・新設で穴あけ作業がある場合、アスベストの調査等も必要となる<br />
+                  　  ・駐車場から荷捌き上まで距離がある<br />
                   </FormDescription>
                   <FormControl>
                     <Textarea {...field} className="min-h-[100px]" placeholder="回答を入力" />

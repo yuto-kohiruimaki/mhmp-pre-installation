@@ -19,6 +19,7 @@ type PhotoUpload = {
   id: string
   title: string
   description: string
+  exampleImage?: string // サンプル画像のURLを追加
   file: File | null
   preview: string | null
 }
@@ -27,28 +28,28 @@ const REQUIRED_PHOTOS: PhotoUpload[] = [
   {
     id: "front",
     title: "工事場所の写真撮影（店舗外より正面から見た写真）",
-    description: "店舗全体が見えるような写真の撮影をお願いします。距離の関係で映らない可能性もあるので、正面左右で計3枚依頼しております。",
+    description: "店舗全体が見えるような写真の撮影をお願いします。",
     file: null,
     preview: null,
   },
   {
     id: "left",
-    title: "工事場所の写真撮影（店舗外よりひだりから見た写真）",
-    description: "店舗全体が見えるような写真の撮影をお願いします。距離の関係で映らない可能性もあるので、正面左右で計3枚依頼しております。",
+    title: "工事場所の写真撮影（店舗外より左から見た写真）",
+    description: "店舗全体が見えるような写真の撮影をお願いします。",
     file: null,
     preview: null,
   },
   {
     id: "right",
-    title: "工事場所の写真撮影（店舗外よりみぎから見た写真）",
-    description: "店舗全体が見えるような写真の撮影をお願いします。距離の関係で映らない可能性もあるので、正面左右で計3枚依頼しております。",
+    title: "工事場所の写真撮影（店舗外より右から見た写真）",
+    description: "店舗全体が見えるような写真の撮影をお願いします。",
     file: null,
     preview: null,
   },
   {
     id: "ceiling",
     title: "店舗内の天井の写真",
-    description: "工事作業の上で必要です。見り場の天井全面がわかるように撮影ください。",
+    description: "工事作業の上で必要です。売り場の天井全面がわかるように撮影ください。",
     file: null,
     preview: null,
   },
@@ -63,7 +64,8 @@ const REQUIRED_PHOTOS: PhotoUpload[] = [
     id: "server",
     title: "工事場所の写真撮影（サーバーラック内（できればルーターやPOEが映るように）",
     description:
-      "サーバーラック内のケーブルやケーブルがさされている端緒がわかる、添付の写真のような形で写真を撮影ください。",
+      "サーバーラック内のケーブルやケーブルがさされている場所がわかる、添付の写真のような形で写真を撮影ください。",
+    exampleImage: "/server-rack-example.png",
     file: null,
     preview: null,
   },
@@ -167,6 +169,16 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
             <div key={photo.id} className="space-y-2">
               <h3 className="text-lg font-semibold">{photo.title}</h3>
               <p className="text-sm text-muted-foreground">{photo.description}</p>
+
+              {/* サンプル画像がある場合は表示 */}
+              {photo.exampleImage && (
+                  <img
+                    src={photo.exampleImage || "/placeholder.svg"}
+                    alt="サーバーラック内の参考画像"
+                    className="object-cover w-[50%] block"
+                  />
+              )}
+
               <div className="mt-2">
                 {photo.preview && (
                   <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg border mb-4">
@@ -215,7 +227,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
             </>
           ) : (
             <>
-              ファイルをアップロードして次へ <ChevronRight className="ml-2 h-4 w-4" />
+              次へ <ChevronRight className="ml-2 h-4 w-4" />
             </>
           )}
         </Button>

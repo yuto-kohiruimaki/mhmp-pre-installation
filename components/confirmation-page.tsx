@@ -22,8 +22,8 @@ const constructionPossibilityLabels: Record<string, string> = {
 // 必要書類の表示用マッピング
 const documentLabels: Record<string, string> = {
   construction: "工事作業申請書",
-  fire: "消防作業申請書",
-  facility: "設備管理申請書",
+  fire: "夜間警備申請書",
+  facility: "高所作業申請書",
   other: "その他",
 }
 
@@ -171,7 +171,7 @@ export function ConfirmationPage({ formData, onBack, onSubmit, isSubmitting }: C
 
                   {requiredDocuments.length > 0 && (
                     <div>
-                      <p className="text-sm text-muted-foreground">工事するまでの要な書類</p>
+                      <p className="text-sm text-muted-foreground">工事する上で必要な書類</p>
                       <ul className="list-disc pl-5 mt-1">
                         {requiredDocuments.map((doc) => (
                           <li key={doc} className="text-base">
