@@ -106,7 +106,7 @@ export function InitialForm({ defaultValues, onSubmit }: InitialFormProps) {
           </CardContent>
           <CardFooter className="flex justify-between border-t p-4">
             <Button variant="outline" type="button" onClick={() => form.reset()}>
-              削除
+              クリア
             </Button>
             <Button type="submit">
               次へ <ChevronRight className="ml-2 h-4 w-4" />

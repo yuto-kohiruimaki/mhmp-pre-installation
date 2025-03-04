@@ -15,7 +15,56 @@ const QUESTIONS = [
   "店舗内観_天井",
   "バックヤード全体",
   "サーバーラック内",
+  // 工事申請情報
+  "作業不可日の有無",
+  "営業時間中の工事作業の可否",
+  "工事するまでの要な書類",
+  "申請の提出方法",
+  "FAX番号",
+  "メールアドレス",
+  "その他提出方法詳細",
+  // 作業申請の際のお約束を2つに分割
+  "施設所定のイントラなどの場合の必要項目",
+  "作業申請の締め切り",
+  "工事書類",
+  "入館時の遵守事項",
+  "荷捌き上の遵守事項",
+  "入館説明用資料",
+  // 作業詳細情報
+  "作業員の車両駐車について",
+  "夜間の作業時間に制限があるか",
+  "制限の詳細",
+  "営業時間外（夜間作業）時に自動消灯されるか",
+  "自動消灯の場合の解除方法",
+  "バックヤードの鍵の管理について",
+  "サーバーラックの鍵の管理について",
+  "その他留意事項",
 ] as const
+
+// 工事作業可否の表示用マッピング
+const constructionPossibilityLabels: Record<string, string> = {
+  possible: "作業可能",
+  impossible: "作業不可",
+  partially: "条件つきで可能",
+  other: "その他",
+}
+
+// 申請方法の表示用マッピング
+const submissionMethodLabels: Record<string, string> = {
+  fax: "FAX",
+  email: "メール",
+  other: "その他",
+}
+
+// 駐車オプションの表示用マッピング
+const parkingOptionLabels: Record<string, string> = {
+  dedicated: "作業用駐車場あり",
+  customer_free: "お客様用駐車場に駐車可能",
+  customer_paid: "お客様用駐車場に駐車可能（有料）",
+  nearby: "駐車なし、近隣の駐車場に停める必要があり",
+  street: "路面上に駐車可能",
+  other: "その他",
+}
 
 export async function appendToSheet(formData: FormData) {
   try {
@@ -31,18 +80,66 @@ export async function appendToSheet(formData: FormData) {
     await doc.loadInfo()
     const sheet = doc.sheetsByIndex[0]
 
+    // シートのサイズを確認し、必要に応じてリサイズ
+    const requiredColumns = QUESTIONS.length
+    if (sheet.columnCount < requiredColumns) {
+      console.log(`Resizing sheet from ${sheet.columnCount} to ${requiredColumns} columns`)
+      await sheet.resize({
+        rowCount: Math.max(sheet.rowCount, 1000), // 行数は現在の行数か1000のいずれか大きい方を維持
+        columnCount: requiredColumns,
+      })
+      // リサイズ後に再度シート情報を読み込む
+      await doc.loadInfo()
+      const updatedSheet = doc.sheetsByIndex[0]
+      console.log(`Sheet resized to ${updatedSheet.columnCount} columns`)
+    }
+
     // ヘッダー行を確認して、必要に応じて追加
     try {
-      await sheet.loadHeaderRow();
-      // ヘッダーが正しく読み込めたら何もしない
+      const headers = await sheet.headerValues
+
+      // ヘッダーが存在するが、列数が足りない場合は更新
+      if (headers && headers.length < QUESTIONS.length) {
+        await sheet.setHeaderRow(QUESTIONS)
+      } else if (!headers || headers.length === 0) {
+        // ヘッダーがない場合はヘッダーを設定
+        await sheet.setHeaderRow(QUESTIONS)
+      }
     } catch (e) {
-      // ヘッダーがない場合はヘッダーを設定
-      await sheet.setHeaderRow(QUESTIONS);
+      // エラーが発生した場合はヘッダーを設定
+      await sheet.setHeaderRow(QUESTIONS)
     }
 
     // 写真URLをJSONからパース
-    const photoUrls = JSON.parse(formData.photoUrls) as Record<string, string>;
-    
+    const photoUrls = formData.photoUrls ? (JSON.parse(formData.photoUrls) as Record<string, string>) : {}
+
+    // S3のURLを「https://bucket-name/店舗名/ファイル」の形式に変換
+    const bucketName = process.env.AWS_BUCKET_NAME
+    const region = process.env.AWS_REGION
+    const s3BaseUrl = `https://${bucketName}.s3.${region}.amazonaws.com`
+
+    // 各写真のフルURLを生成
+    const photoFullUrls = Object.entries(photoUrls).reduce(
+      (acc, [key, path]) => {
+        acc[key] = `${s3BaseUrl}/${path}`
+        return acc
+      },
+      {} as Record<string, string>,
+    )
+
+    // 工事書類のURLを生成（存在する場合）
+    let constructionDocumentUrls: Record<string, string> = {}
+    if (formData.constructionDocuments) {
+      const documents = JSON.parse(formData.constructionDocuments) as Record<string, string>
+      constructionDocumentUrls = Object.entries(documents).reduce(
+        (acc, [key, path]) => {
+          acc[key] = `${s3BaseUrl}/${path}`
+          return acc
+        },
+        {} as Record<string, string>,
+      )
+    }
+
     // Format the data to match the headers
     const rowData = {
       [QUESTIONS[0]]: formData.storeName,
@@ -50,12 +147,42 @@ export async function appendToSheet(formData: FormData) {
       [QUESTIONS[2]]: formData.needsDirectCommunication === "yes" ? "はい" : "いいえ",
       [QUESTIONS[3]]: formData.managerName || "-",
       [QUESTIONS[4]]: formData.managerPhone || "-",
-      [QUESTIONS[5]]: photoUrls.front || "-",
-      [QUESTIONS[6]]: photoUrls.left || "-",
-      [QUESTIONS[7]]: photoUrls.right || "-",
-      [QUESTIONS[8]]: photoUrls.ceiling || "-",
-      [QUESTIONS[9]]: photoUrls.backyard || "-",
-      [QUESTIONS[10]]: photoUrls.server || "-",
+      [QUESTIONS[5]]: photoFullUrls.front || "-",
+      [QUESTIONS[6]]: photoFullUrls.left || "-",
+      [QUESTIONS[7]]: photoFullUrls.right || "-",
+      [QUESTIONS[8]]: photoFullUrls.ceiling || "-",
+      [QUESTIONS[9]]: photoFullUrls.backyard || "-",
+      [QUESTIONS[10]]: photoFullUrls.server || "-",
+      // 工事申請情報
+      [QUESTIONS[11]]: formData.unavailableDates || "-",
+      [QUESTIONS[12]]: formData.constructionPossibility
+        ? constructionPossibilityLabels[formData.constructionPossibility]
+        : "-",
+      [QUESTIONS[13]]: formData.requiredDocuments ? JSON.stringify(formData.requiredDocuments) : "-",
+      [QUESTIONS[14]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
+      [QUESTIONS[15]]: formData.faxNumber || "-",
+      [QUESTIONS[16]]: formData.emailAddress || "-",
+      [QUESTIONS[17]]: formData.otherSubmissionDetails || "-",
+      // 作業申請の際のお約束を2つに分割
+      [QUESTIONS[18]]: formData.requiredItems || "-",
+      [QUESTIONS[19]]: formData.applicationDeadline || "-",
+      [QUESTIONS[20]]: JSON.stringify(constructionDocumentUrls) || "-",
+      [QUESTIONS[21]]: formData.entryProcedures || "-",
+      [QUESTIONS[22]]: formData.loadingProcedures || "-",
+      [QUESTIONS[23]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
+      // 作業詳細情報
+      [QUESTIONS[24]]: formData.parkingOption
+        ? parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption
+        : "-",
+      [QUESTIONS[25]]:
+        formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
+      [QUESTIONS[26]]: formData.restrictionDetails || "-",
+      [QUESTIONS[27]]:
+        formData.autoLightOff === "yes" ? "自動消灯" : formData.autoLightOff === "no" ? "自動消灯なし" : "-",
+      [QUESTIONS[28]]: formData.lightOffDetails || "-",
+      [QUESTIONS[29]]: formData.backyardKeyManagement || "-",
+      [QUESTIONS[30]]: formData.serverRackKeyManagement || "-",
+      [QUESTIONS[31]]: formData.otherConsiderations || "-",
     }
 
     // Add the new row
@@ -67,3 +194,4 @@ export async function appendToSheet(formData: FormData) {
     return { success: false, error: `Failed to save data: ${error}` }
   }
 }
+
