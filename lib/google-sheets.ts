@@ -81,10 +81,10 @@ console.log("REGION:", process.env.REGION)
 
 export async function appendToSheet(formData: FormData) {
   try {
-    // Initialize auth
+    // JWTの初期化部分を修正
     const serviceAccountAuth = new JWT({
       email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-      key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.split(String.raw`\n`).join('\n'),
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     })
 
