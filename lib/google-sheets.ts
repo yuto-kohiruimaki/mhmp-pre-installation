@@ -27,7 +27,11 @@ const QUESTIONS = [
   // 作業申請の際のお約束を2つに分割
   "施設所定のイントラなどの場合の必要項目",
   "作業申請の締め切り",
-  "工事書類",
+  // 工事書類を4つの別々の列に分ける
+  "工事作業申請書",
+  "夜間警備申請書",
+  "高所作業申請書",
+  "その他書類",
   "入館時の遵守事項",
   "荷捌き上の遵守事項",
   "入館説明用資料",
@@ -41,6 +45,7 @@ const QUESTIONS = [
   "バックヤードの鍵の管理について",
   "サーバーラックの鍵の管理について",
   "その他留意事項",
+  "送信日時",
 ] as const
 
 // 工事作業可否の表示用マッピング
@@ -81,8 +86,6 @@ console.log("REGION:", process.env.REGION)
 
 export async function appendToSheet(formData: FormData) {
   try {
-    // JWTの初期化部分を修正
-    console.log(process.env.GOOGLE_SHEETS_PRIVATE_KEY?.split(String.raw`\n`).join('\n'))
     const serviceAccountAuth = new JWT({
       email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
       key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.split(String.raw`\n`).join('\n'),
@@ -144,14 +147,20 @@ export async function appendToSheet(formData: FormData) {
     let constructionDocumentUrls: Record<string, string> = {}
     if (formData.constructionDocuments) {
       const documents = JSON.parse(formData.constructionDocuments) as Record<string, string>
-      constructionDocumentUrls = Object.entries(documents).reduce(
-        (acc, [key, path]) => {
-          acc[key] = `${s3BaseUrl}/${path}`
-          return acc
-        },
-        {} as Record<string, string>,
-      )
+      Object.entries(documents).forEach(([key, url]) => {
+        // URLが既にS3の完全なURLの場合はそのまま使用し、そうでない場合はS3のURLを構築
+        if (url.startsWith('http')) {
+          constructionDocumentUrls[key] = url
+        } else {
+          constructionDocumentUrls[key] = `${s3BaseUrl}/${url}`
+        }
+      })
     }
+
+    // 現在の日本時間を取得
+    const now = new Date();
+    const japanTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9時間
+    const formattedJapanTime = japanTime.toISOString().replace('T', ' ').substring(0, 19);
 
     // Format the data to match the headers
     const rowData = {
@@ -182,24 +191,29 @@ export async function appendToSheet(formData: FormData) {
       // 作業申請の際のお約束を2つに分割
       [QUESTIONS[19]]: formData.requiredItems || "-",
       [QUESTIONS[20]]: formData.applicationDeadline || "-",
-      [QUESTIONS[21]]: JSON.stringify(constructionDocumentUrls) || "-",
-      [QUESTIONS[22]]: formData.entryProcedures || "-",
-      [QUESTIONS[23]]: formData.loadingProcedures || "-",
-      [QUESTIONS[24]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
+      // 工事書類を4つの別々の列に分ける
+      [QUESTIONS[21]]: constructionDocumentUrls.construction || "-",
+      [QUESTIONS[22]]: constructionDocumentUrls.fire || "-",
+      [QUESTIONS[23]]: constructionDocumentUrls.facility || "-",
+      [QUESTIONS[24]]: constructionDocumentUrls.other || "-",
+      [QUESTIONS[25]]: formData.entryProcedures || "-",
+      [QUESTIONS[26]]: formData.loadingProcedures || "-",
+      [QUESTIONS[27]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
       // 作業詳細情報
-      [QUESTIONS[25]]: formData.parkingOption
+      [QUESTIONS[28]]: formData.parkingOption
         ? parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption
         : "-",
-      [QUESTIONS[26]]: formData.parkingOptionOther || "-", // その他の詳細
-      [QUESTIONS[27]]:
+      [QUESTIONS[29]]: formData.parkingOptionOther || "-", // その他の詳細
+      [QUESTIONS[30]]:
         formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
-      [QUESTIONS[28]]: formData.restrictionDetails || "-",
-      [QUESTIONS[29]]:
+      [QUESTIONS[31]]: formData.restrictionDetails || "-",
+      [QUESTIONS[32]]:
         formData.autoLightOff === "yes" ? "自動消灯" : formData.autoLightOff === "no" ? "自動消灯なし" : "-",
-      [QUESTIONS[30]]: formData.lightOffDetails || "-",
-      [QUESTIONS[31]]: formData.backyardKeyManagement || "-",
-      [QUESTIONS[32]]: formData.serverRackKeyManagement || "-",
-      [QUESTIONS[33]]: formData.otherConsiderations || "-",
+      [QUESTIONS[33]]: formData.lightOffDetails || "-",
+      [QUESTIONS[34]]: formData.backyardKeyManagement || "-",
+      [QUESTIONS[35]]: formData.serverRackKeyManagement || "-",
+      [QUESTIONS[36]]: formData.otherConsiderations || "-",
+      [QUESTIONS[37]]: formattedJapanTime, // 送信日時（日本時間）を追加
     }
 
     // Add the new row
@@ -211,4 +225,3 @@ export async function appendToSheet(formData: FormData) {
     return { success: false, error: `Failed to save data: ${error}` }
   }
 }
-

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { FormData } from "@/types/form"
 import type { InitialFormValues, FacilityManagerFormValues, ConstructionFormValues } from "@/lib/schema"
 import { InitialForm } from "./initial-form"
@@ -40,6 +40,15 @@ export default function SurveyForm() {
     managerPhone: "",
     photoUrls: "",
   })
+
+
+  // ステップが変更されたときにページトップにスクロール
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
+  }, [currentStep, isSubmitted])
 
   // 初期フォームの送信処理
   function handleInitialSubmit(values: InitialFormValues) {
