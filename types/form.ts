@@ -4,7 +4,7 @@ export type FormData = {
   needsDirectCommunication: string
   managerName: string
   managerPhone: string
-  photoUrls: string
+  photoUrls: Record<string, string> // Changed from string
   // 工事申請情報
   unavailableDates?: string
   constructionPossibility?: "possible" | "impossible" | "partially" | "other"

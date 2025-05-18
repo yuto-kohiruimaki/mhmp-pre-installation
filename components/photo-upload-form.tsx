@@ -4,19 +4,15 @@ import type React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea" // Import Textarea
+// Removed Textarea import
 import { ArrowLeft, ChevronRight, Upload, Trash2, Loader2 } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { getPresignedUrl } from "@/app/actions"
 
-interface PhotoUploadSubmitData {
-  photoUrls: Record<string, string>
-  serverRackNotes?: string
-}
-
+// Reverted PhotoUploadSubmitData and PhotoUploadFormProps
 interface PhotoUploadFormProps {
-  onNext: (data: PhotoUploadSubmitData) => void
+  onNext: (photoUrls: Record<string, string>) => void
   onBack: () => void
   storeName: string
 }
@@ -90,7 +86,7 @@ const FILE_NAMES = {
 
 export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormProps) {
   const [photos, setPhotos] = useState<PhotoUpload[]>(REQUIRED_PHOTOS)
-  const [serverRackNotes, setServerRackNotes] = useState("") // New state for server rack notes
+  // Removed serverRackNotes state
   const [error, setError] = useState("")
   const [isUploading, setIsUploading] = useState(false)
 
@@ -156,7 +152,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
         }
       }
 
-      onNext({ photoUrls, serverRackNotes }) // Pass notes in handleSubmit
+      onNext(photoUrls) // Reverted to pass only photoUrls
     } catch (error) {
       setError(error instanceof Error ? error.message : "写真のアップロードに失敗しました")
     } finally {
@@ -225,21 +221,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
                 </div>
                 {photo.file && <p className="mt-2 text-sm text-muted-foreground">選択中: {photo.file.name}</p>}
               </div>
-              {/* Textarea for server rack notes */}
-              {photo.id === "server" && (
-                <div className="mt-4 space-y-2">
-                  <label htmlFor="serverRackNotes" className="text-sm font-medium text-gray-700">
-                    サーバーラックについて、補足事項があればご記入ください。
-                  </label>
-                  <Textarea
-                    id="serverRackNotes"
-                    value={serverRackNotes}
-                    onChange={(e) => setServerRackNotes(e.target.value)}
-                    placeholder="鍵自体なし、そのまま開けられるなど"
-                    className="min-h-[80px]"
-                  />
-                </div>
-              )}
+              {/* Removed Textarea for server rack notes */}
             </div>
           ))}
           {error && (
