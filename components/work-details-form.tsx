@@ -3,9 +3,12 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input" // Import Input
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
+import { useState } from "react" // Import useState
+import Image from "next/image" // Import Image
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft, ChevronRight } from "lucide-react"
 import { workDetailsFormSchema, type WorkDetailsFormValues } from "@/lib/schema"
@@ -36,9 +39,12 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
       lightOffDetails: "",
       backyardKeyManagement: "",
       serverRackKeyManagement: "",
+      entranceMapFile: undefined,
       otherConsiderations: "",
     },
   })
+
+  const [entranceMapPreview, setEntranceMapPreview] = useState<string | null>(null)
 
   return (
     <Card className="w-full">
@@ -231,6 +237,45 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
 
             <FormField
               control={form.control}
+              name="entranceMapFile"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-base font-medium">
+                    入館口がわかる地図などがありましたら添付してください。
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                      onChange={(e) => {
+                        const file = e.target.files ? e.target.files[0] : null
+                        field.onChange(file)
+                        if (file && file.type.startsWith("image/")) {
+                          setEntranceMapPreview(URL.createObjectURL(file))
+                        } else {
+                          setEntranceMapPreview(null)
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  {entranceMapPreview && (
+                    <div className="mt-2 relative aspect-video w-full max-w-sm overflow-hidden rounded-lg border">
+                      <Image src={entranceMapPreview} alt="入館口地図プレビュー" fill className="object-contain" />
+                    </div>
+                  )}
+                  {field.value && !entranceMapPreview && (
+                    <p className="text-sm text-muted-foreground mt-1">選択中のファイル: {field.value.name}</p>
+                  )}
+                   {field.value && entranceMapPreview && (
+                    <p className="text-sm text-muted-foreground mt-1">選択中のファイル: {field.value.name}</p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="serverRackKeyManagement"
               render={({ field }) => (
                 <FormItem>
@@ -239,6 +284,14 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
                   </FormLabel>
                   <FormDescription>
                     ルーター周りがあるラックです。必ず作業時に使用しますので、施錠されている場合は、鍵の解除方法をご教示ください。電子施錠の場合はその解除番号もお願いします。施錠されない場合は施錠なしとご記入ください。
+                    <br />
+                    以下の情報を参考に、可能な限り詳しくご記入をお願いいたします。
+                    <br />
+                    ・鍵の種類（例：ダイヤルキー、回しキー など）
+                    <br />
+                    ・鍵の保管場所（例：入館口ポストなど）
+                    <br />
+                    ・その他、鍵に関する注意点や特記事項
                   </FormDescription>
                   <FormControl>
                     <Textarea {...field} className="min-h-[100px]" placeholder="回答を入力" />
@@ -283,4 +336,3 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
     </Card>
   )
 }
-

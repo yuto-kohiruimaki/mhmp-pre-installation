@@ -22,6 +22,7 @@ export function InitialForm({ defaultValues, onSubmit }: InitialFormProps) {
     defaultValues: defaultValues || {
       storeName: "",
       phoneNumber: "",
+      businessHours: "",
     },
   })
 
@@ -79,6 +80,22 @@ export function InitialForm({ defaultValues, onSubmit }: InitialFormProps) {
 
               <FormField
                 control={form.control}
+                name="businessHours"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">
+                      営業時間 (例: 10:00-20:00) <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="例: 10:00-20:00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="needsDirectCommunication"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
@@ -122,4 +139,3 @@ export function InitialForm({ defaultValues, onSubmit }: InitialFormProps) {
     </Card>
   )
 }
-

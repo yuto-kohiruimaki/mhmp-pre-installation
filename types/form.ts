@@ -38,11 +38,15 @@ export type FormData = {
 export type InitialFormData = {
   storeName: string
   phoneNumber: string
+  businessHours: string // 営業時間
   needsDirectCommunication: "yes" | "no"
 }
 
 export type FacilityManagerFormData = {
   managerName: string
   managerPhone: string
+  storeContactName: string
+  storeContactPhone: string
+  disasterPreventionCenterName?: string
+  disasterPreventionCenterPhone: string
 }
-

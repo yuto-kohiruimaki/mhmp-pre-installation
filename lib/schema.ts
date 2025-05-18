@@ -9,6 +9,7 @@ export const initialFormSchema = z.object({
     .string()
     .min(1, { message: "電話番号を入力してください" })
     .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
+  businessHours: z.string().min(1, { message: "営業時間を入力してください" }), // 営業時間
   needsDirectCommunication: z.enum(["yes", "no"], {
     required_error: "選択してください",
   }),
@@ -17,6 +18,16 @@ export const initialFormSchema = z.object({
 export const facilityManagerFormSchema = z.object({
   managerName: z.string().min(1, { message: "担当者様のお名前を入力してください" }),
   managerPhone: z
+    .string()
+    .min(1, { message: "電話番号を入力してください" })
+    .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
+  storeContactName: z.string().min(1, { message: "お名前を入力してください" }),
+  storeContactPhone: z
+    .string()
+    .min(1, { message: "電話番号を入力してください" })
+    .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
+  disasterPreventionCenterName: z.string().optional(),
+  disasterPreventionCenterPhone: z
     .string()
     .min(1, { message: "電話番号を入力してください" })
     .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
@@ -66,6 +77,7 @@ export const workDetailsFormSchema = z.object({
   lightOffDetails: z.string().optional(),
   backyardKeyManagement: z.string().min(1, { message: "バックヤードの鍵の管理方法を入力してください" }),
   serverRackKeyManagement: z.string().min(1, { message: "サーバーラックの鍵の管理方法を入力してください" }),
+  entranceMapFile: z.any().optional(), // For file uploads
   otherConsiderations: z.string().optional(),
 })
 
@@ -74,4 +86,3 @@ export type FacilityManagerFormValues = z.infer<typeof facilityManagerFormSchema
 export type ConstructionFormValues = z.infer<typeof constructionFormSchema>
 export type FacilityAccessFormValues = z.infer<typeof facilityAccessFormSchema>
 export type WorkDetailsFormValues = z.infer<typeof workDetailsFormSchema>
-

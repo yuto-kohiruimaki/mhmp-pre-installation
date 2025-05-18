@@ -4,13 +4,19 @@ import type React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea" // Import Textarea
 import { ArrowLeft, ChevronRight, Upload, Trash2, Loader2 } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { getPresignedUrl } from "@/app/actions"
 
+interface PhotoUploadSubmitData {
+  photoUrls: Record<string, string>
+  serverRackNotes?: string
+}
+
 interface PhotoUploadFormProps {
-  onNext: (photoUrls: Record<string, string>) => void
+  onNext: (data: PhotoUploadSubmitData) => void
   onBack: () => void
   storeName: string
 }
@@ -20,6 +26,7 @@ type PhotoUpload = {
   title: string
   description: string
   exampleImage?: string // サンプル画像のURLを追加
+  exampleImage2?: string // サンプル画像2のURLを追加
   file: File | null
   preview: string | null
 }
@@ -66,6 +73,7 @@ const REQUIRED_PHOTOS: PhotoUpload[] = [
     description:
       "サーバーラック内のケーブルやケーブルがさされている場所がわかる、添付の写真のような形で写真を撮影ください。",
     exampleImage: "/server-rack-example.png",
+    exampleImage2: "/server-rack-example2.jpg", // New example image
     file: null,
     preview: null,
   },
@@ -82,6 +90,7 @@ const FILE_NAMES = {
 
 export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormProps) {
   const [photos, setPhotos] = useState<PhotoUpload[]>(REQUIRED_PHOTOS)
+  const [serverRackNotes, setServerRackNotes] = useState("") // New state for server rack notes
   const [error, setError] = useState("")
   const [isUploading, setIsUploading] = useState(false)
 
@@ -147,7 +156,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
         }
       }
 
-      onNext(photoUrls)
+      onNext({ photoUrls, serverRackNotes }) // Pass notes in handleSubmit
     } catch (error) {
       setError(error instanceof Error ? error.message : "写真のアップロードに失敗しました")
     } finally {
@@ -178,6 +187,17 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
                     className="object-cover w-[50%] block"
                   />
               )}
+              {/* サンプル画像2がある場合は表示 */}
+              {photo.id === "server" && photo.exampleImage2 && (
+                <div className="mt-2">
+                  <p className="text-sm text-muted-foreground mb-1">※サーバーラックのイメージ</p>
+                  <img
+                    src={photo.exampleImage2}
+                    alt="サーバーラックのイメージ"
+                    className="object-cover w-[50%] block"
+                  />
+                </div>
+              )}
 
               <div className="mt-2">
                 {photo.preview && (
@@ -205,6 +225,21 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
                 </div>
                 {photo.file && <p className="mt-2 text-sm text-muted-foreground">選択中: {photo.file.name}</p>}
               </div>
+              {/* Textarea for server rack notes */}
+              {photo.id === "server" && (
+                <div className="mt-4 space-y-2">
+                  <label htmlFor="serverRackNotes" className="text-sm font-medium text-gray-700">
+                    サーバーラックについて、補足事項があればご記入ください。
+                  </label>
+                  <Textarea
+                    id="serverRackNotes"
+                    value={serverRackNotes}
+                    onChange={(e) => setServerRackNotes(e.target.value)}
+                    placeholder="鍵自体なし、そのまま開けられるなど"
+                    className="min-h-[80px]"
+                  />
+                </div>
+              )}
             </div>
           ))}
           {error && (
@@ -235,4 +270,3 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
     </Card>
   )
 }
-
