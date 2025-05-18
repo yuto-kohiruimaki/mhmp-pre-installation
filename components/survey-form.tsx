@@ -35,10 +35,15 @@ export default function SurveyForm() {
   const [formData, setFormData] = useState<FormData>({
     storeName: "",
     phoneNumber: "",
+    businessHours: "",
     needsDirectCommunication: "",
     managerName: "",
     managerPhone: "",
-    photoUrls: "",
+    photoUrls: {} as Record<string, string>,
+    storeContactName: "",
+    storeContactPhone: "",
+    disasterPreventionCenterName: "",
+    disasterPreventionCenterPhone: "",
   })
 
 
@@ -56,6 +61,7 @@ export default function SurveyForm() {
       ...prev,
       storeName: values.storeName,
       phoneNumber: values.phoneNumber,
+      businessHours: values.businessHours,
       needsDirectCommunication: values.needsDirectCommunication,
     }))
 
@@ -73,6 +79,10 @@ export default function SurveyForm() {
       ...prev,
       managerName: values.managerName,
       managerPhone: values.managerPhone,
+      storeContactName: values.storeContactName,
+      storeContactPhone: values.storeContactPhone,
+      disasterPreventionCenterName: values.disasterPreventionCenterName,
+      disasterPreventionCenterPhone: values.disasterPreventionCenterPhone,
     }))
     setCurrentStep(FormStep.PHOTO_UPLOAD)
   }
@@ -81,7 +91,7 @@ export default function SurveyForm() {
   function handlePhotoUpload(urls: Record<string, string>) {
     setFormData((prev) => ({
       ...prev,
-      photoUrls: JSON.stringify(urls),
+      photoUrls: urls,
     }))
     setCurrentStep(FormStep.CONSTRUCTION)
   }
@@ -190,10 +200,15 @@ export default function SurveyForm() {
     setFormData({
       storeName: "",
       phoneNumber: "",
+      businessHours: "",
       needsDirectCommunication: "",
       managerName: "",
       managerPhone: "",
-      photoUrls: "",
+      photoUrls: {} as Record<string, string>,
+      storeContactName: "",
+      storeContactPhone: "",
+      disasterPreventionCenterName: "",
+      disasterPreventionCenterPhone: "",
     })
     setCurrentStep(FormStep.INITIAL)
     setIsSubmitted(false)
@@ -212,6 +227,7 @@ export default function SurveyForm() {
           defaultValues={{
             storeName: formData.storeName,
             phoneNumber: formData.phoneNumber,
+            businessHours: formData.businessHours,
             needsDirectCommunication: formData.needsDirectCommunication as "yes" | "no",
           }}
           onSubmit={handleInitialSubmit}
@@ -224,6 +240,10 @@ export default function SurveyForm() {
           defaultValues={{
             managerName: formData.managerName,
             managerPhone: formData.managerPhone,
+            storeContactName: formData.storeContactName,
+            storeContactPhone: formData.storeContactPhone,
+            disasterPreventionCenterName: formData.disasterPreventionCenterName,
+            disasterPreventionCenterPhone: formData.disasterPreventionCenterPhone,
           }}
           onSubmit={handleFacilityManagerSubmit}
           onBack={handleBack}
@@ -300,4 +320,3 @@ export default function SurveyForm() {
       return null
   }
 }
-

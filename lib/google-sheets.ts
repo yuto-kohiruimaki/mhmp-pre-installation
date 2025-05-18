@@ -3,12 +3,17 @@ import { JWT } from "google-auth-library"
 import type { FormData } from "@/types/form"
 
 // Questions in the order they should appear in the spreadsheet
-const QUESTIONS = [
+const QUESTIONS: string[] = [
   "店舗名",
   "店舗電話番号",
+  "営業時間",
   "工事作業申請の対応に防災や施設管理と直接やり取りする必要があるか？",
   "施設のご担当者様のお名前",
   "施設のご担当者様の電話番号",
+  "店舗窓口_お名前",
+  "店舗窓口_電話番号",
+  "防災センターご連絡先_お名前",
+  "防災センターご連絡先_電話番号",
   "店舗外観_正面",
   "店舗外観_左",
   "店舗外観_右",
@@ -46,7 +51,7 @@ const QUESTIONS = [
   "サーバーラックの鍵の管理について",
   "その他留意事項",
   "送信日時",
-] as const
+]
 
 // 工事作業可否の表示用マッピング
 const constructionPossibilityLabels: Record<string, string> = {
@@ -126,8 +131,8 @@ export async function appendToSheet(formData: FormData) {
       await sheet.setHeaderRow(QUESTIONS)
     }
 
-    // 写真URLをJSONからパース
-    const photoUrls = formData.photoUrls ? (JSON.parse(formData.photoUrls) as Record<string, string>) : {}
+    // 写真URL (既にオブジェクトとして受け取る)
+    const photoUrls: Record<string, string> = formData.photoUrls || {}
 
     // S3のURLを「https://bucket-name/店舗名/ファイル」の形式に変換
     const bucketName = process.env.BUCKET_NAME
@@ -166,54 +171,59 @@ export async function appendToSheet(formData: FormData) {
     const rowData = {
       [QUESTIONS[0]]: formData.storeName,
       [QUESTIONS[1]]: formData.phoneNumber,
-      [QUESTIONS[2]]: formData.needsDirectCommunication === "yes" ? "はい" : "いいえ",
-      [QUESTIONS[3]]: formData.managerName || "-",
-      [QUESTIONS[4]]: formData.managerPhone || "-",
-      [QUESTIONS[5]]: photoFullUrls.front || "-",
-      [QUESTIONS[6]]: photoFullUrls.left || "-",
-      [QUESTIONS[7]]: photoFullUrls.right || "-",
-      [QUESTIONS[8]]: photoFullUrls.ceiling || "-",
-      [QUESTIONS[9]]: photoFullUrls.backyard || "-",
-      [QUESTIONS[10]]: photoFullUrls.server || "-",
+      [QUESTIONS[2]]: formData.businessHours || "-",
+      [QUESTIONS[3]]: formData.needsDirectCommunication === "yes" ? "はい" : "いいえ",
+      [QUESTIONS[4]]: formData.managerName || "-",
+      [QUESTIONS[5]]: formData.managerPhone || "-",
+      [QUESTIONS[6]]: formData.storeContactName || "-",
+      [QUESTIONS[7]]: formData.storeContactPhone || "-",
+      [QUESTIONS[8]]: formData.disasterPreventionCenterName || "-",
+      [QUESTIONS[9]]: formData.disasterPreventionCenterPhone || "-",
+      [QUESTIONS[10]]: photoFullUrls.front || "-",
+      [QUESTIONS[11]]: photoFullUrls.left || "-",
+      [QUESTIONS[12]]: photoFullUrls.right || "-",
+      [QUESTIONS[13]]: photoFullUrls.ceiling || "-",
+      [QUESTIONS[14]]: photoFullUrls.backyard || "-",
+      [QUESTIONS[15]]: photoFullUrls.server || "-",
       // 工事申請情報
-      [QUESTIONS[11]]: formData.unavailableDates || "-",
-      [QUESTIONS[12]]: formData.constructionPossibility
+      [QUESTIONS[16]]: formData.unavailableDates || "-",
+      [QUESTIONS[17]]: formData.constructionPossibility
         ? constructionPossibilityLabels[formData.constructionPossibility]
         : "-",
-      [QUESTIONS[13]]: formData.constructionPossibilityOther || "-", // その他の詳細
-      [QUESTIONS[14]]: formData.requiredDocuments
+      [QUESTIONS[18]]: formData.constructionPossibilityOther || "-", // その他の詳細
+      [QUESTIONS[19]]: formData.requiredDocuments
         ? JSON.stringify(formData.requiredDocuments.map((doc) => documentLabels[doc] || doc))
         : "-",
-      [QUESTIONS[15]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
-      [QUESTIONS[16]]: formData.faxNumber || "-",
-      [QUESTIONS[17]]: formData.emailAddress || "-",
-      [QUESTIONS[18]]: formData.otherSubmissionDetails || "-", // その他の詳細
+      [QUESTIONS[20]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
+      [QUESTIONS[21]]: formData.faxNumber || "-",
+      [QUESTIONS[22]]: formData.emailAddress || "-",
+      [QUESTIONS[23]]: formData.otherSubmissionDetails || "-", // その他の詳細
       // 作業申請の際のお約束を2つに分割
-      [QUESTIONS[19]]: formData.requiredItems || "-",
-      [QUESTIONS[20]]: formData.applicationDeadline || "-",
+      [QUESTIONS[24]]: formData.requiredItems || "-",
+      [QUESTIONS[25]]: formData.applicationDeadline || "-",
       // 工事書類を4つの別々の列に分ける
-      [QUESTIONS[21]]: constructionDocumentUrls.construction || "-",
-      [QUESTIONS[22]]: constructionDocumentUrls.fire || "-",
-      [QUESTIONS[23]]: constructionDocumentUrls.facility || "-",
-      [QUESTIONS[24]]: constructionDocumentUrls.other || "-",
-      [QUESTIONS[25]]: formData.entryProcedures || "-",
-      [QUESTIONS[26]]: formData.loadingProcedures || "-",
-      [QUESTIONS[27]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
+      [QUESTIONS[26]]: constructionDocumentUrls.construction || "-",
+      [QUESTIONS[27]]: constructionDocumentUrls.fire || "-",
+      [QUESTIONS[28]]: constructionDocumentUrls.facility || "-",
+      [QUESTIONS[29]]: constructionDocumentUrls.other || "-",
+      [QUESTIONS[30]]: formData.entryProcedures || "-",
+      [QUESTIONS[31]]: formData.loadingProcedures || "-",
+      [QUESTIONS[32]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
       // 作業詳細情報
-      [QUESTIONS[28]]: formData.parkingOption
+      [QUESTIONS[33]]: formData.parkingOption
         ? parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption
         : "-",
-      [QUESTIONS[29]]: formData.parkingOptionOther || "-", // その他の詳細
-      [QUESTIONS[30]]:
+      [QUESTIONS[34]]: formData.parkingOptionOther || "-", // その他の詳細
+      [QUESTIONS[35]]:
         formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
-      [QUESTIONS[31]]: formData.restrictionDetails || "-",
-      [QUESTIONS[32]]:
+      [QUESTIONS[36]]: formData.restrictionDetails || "-",
+      [QUESTIONS[37]]:
         formData.autoLightOff === "yes" ? "自動消灯" : formData.autoLightOff === "no" ? "自動消灯なし" : "-",
-      [QUESTIONS[33]]: formData.lightOffDetails || "-",
-      [QUESTIONS[34]]: formData.backyardKeyManagement || "-",
-      [QUESTIONS[35]]: formData.serverRackKeyManagement || "-",
-      [QUESTIONS[36]]: formData.otherConsiderations || "-",
-      [QUESTIONS[37]]: formattedJapanTime, // 送信日時（日本時間）を追加
+      [QUESTIONS[38]]: formData.lightOffDetails || "-",
+      [QUESTIONS[39]]: formData.backyardKeyManagement || "-",
+      [QUESTIONS[40]]: formData.serverRackKeyManagement || "-",
+      [QUESTIONS[41]]: formData.otherConsiderations || "-",
+      [QUESTIONS[42]]: formattedJapanTime, // 送信日時（日本時間）を追加
     }
 
     // Add the new row

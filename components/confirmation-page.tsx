@@ -62,7 +62,7 @@ const yesNoLabels: Record<string, string> = {
 
 export function ConfirmationPage({ formData, onBack, onSubmit, isSubmitting }: ConfirmationPageProps) {
   // 写真URLをJSONからパース
-  const photoUrls = formData.photoUrls ? (JSON.parse(formData.photoUrls) as Record<string, string>) : {}
+  const photoUrls = formData.photoUrls || {}
 
   // 工事書類をJSONからパース
   const constructionDocuments = formData.constructionDocuments
@@ -372,4 +372,3 @@ export function ConfirmationPage({ formData, onBack, onSubmit, isSubmitting }: C
     </Card>
   )
 }
-

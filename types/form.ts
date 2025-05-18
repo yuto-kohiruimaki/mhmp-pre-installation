@@ -1,9 +1,14 @@
 export type FormData = {
   storeName: string
   phoneNumber: string
+  businessHours: string // added businessHours to FormData
   needsDirectCommunication: string
   managerName: string
   managerPhone: string
+  storeContactName: string
+  storeContactPhone: string
+  disasterPreventionCenterName?: string
+  disasterPreventionCenterPhone: string
   photoUrls: Record<string, string> // Changed from string
   // 工事申請情報
   unavailableDates?: string
