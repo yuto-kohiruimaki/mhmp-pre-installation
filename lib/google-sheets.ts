@@ -40,6 +40,7 @@ const QUESTIONS: string[] = [
   "入館時の遵守事項",
   "荷捌き上の遵守事項",
   "入館説明用資料",
+  "入館地図",
   // 作業詳細情報
   "作業員の車両駐車について",
   "作業員の車両駐車について（その他詳細）", // その他の詳細を追加
@@ -88,6 +89,8 @@ const documentLabels: Record<string, string> = {
 console.log("BUCKET_NAME:", process.env.BUCKET_NAME)
 console.log("REGION:", process.env.REGION)
 
+// S3 base URL for public access
+const s3BaseUrl = `https://${process.env.BUCKET_NAME}.s3.${process.env.REGION}.amazonaws.com`
 
 export async function appendToSheet(formData: FormData) {
   try {
@@ -133,11 +136,6 @@ export async function appendToSheet(formData: FormData) {
 
     // 写真URL (既にオブジェクトとして受け取る)
     const photoUrls: Record<string, string> = formData.photoUrls || {}
-
-    // S3のURLを「https://bucket-name/店舗名/ファイル」の形式に変換
-    const bucketName = process.env.BUCKET_NAME
-    const region = process.env.REGION
-    const s3BaseUrl = `https://${bucketName}.s3.${region}.amazonaws.com`
 
     // 各写真のフルURLを生成
     const photoFullUrls = Object.entries(photoUrls).reduce(
@@ -209,21 +207,21 @@ export async function appendToSheet(formData: FormData) {
       [QUESTIONS[30]]: formData.entryProcedures || "-",
       [QUESTIONS[31]]: formData.loadingProcedures || "-",
       [QUESTIONS[32]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
-      // 作業詳細情報
-      [QUESTIONS[33]]: formData.parkingOption
+      [QUESTIONS[33]]: formData.entranceMapUrl ? `${s3BaseUrl}/${formData.entranceMapUrl}` : "-",
+      [QUESTIONS[34]]: formData.parkingOption
         ? parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption
         : "-",
-      [QUESTIONS[34]]: formData.parkingOptionOther || "-", // その他の詳細
-      [QUESTIONS[35]]:
+      [QUESTIONS[35]]: formData.parkingOptionOther || "-", // その他の詳細
+      [QUESTIONS[36]]:
         formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
-      [QUESTIONS[36]]: formData.restrictionDetails || "-",
-      [QUESTIONS[37]]:
+      [QUESTIONS[37]]: formData.restrictionDetails || "-",
+      [QUESTIONS[38]]:
         formData.autoLightOff === "yes" ? "自動消灯" : formData.autoLightOff === "no" ? "自動消灯なし" : "-",
-      [QUESTIONS[38]]: formData.lightOffDetails || "-",
-      [QUESTIONS[39]]: formData.backyardKeyManagement || "-",
-      [QUESTIONS[40]]: formData.serverRackKeyManagement || "-",
-      [QUESTIONS[41]]: formData.otherConsiderations || "-",
-      [QUESTIONS[42]]: formattedJapanTime, // 送信日時（日本時間）を追加
+      [QUESTIONS[39]]: formData.lightOffDetails || "-",
+      [QUESTIONS[40]]: formData.backyardKeyManagement || "-",
+      [QUESTIONS[41]]: formData.serverRackKeyManagement || "-",
+      [QUESTIONS[42]]: formData.otherConsiderations || "-",
+      [QUESTIONS[43]]: formattedJapanTime, // 送信日時（日本時間）を追加
     }
 
     // Add the new row

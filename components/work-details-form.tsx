@@ -10,13 +10,15 @@ import { useForm } from "react-hook-form"
 import { useState } from "react" // Import useState
 import Image from "next/image" // Import Image
 import { zodResolver } from "@hookform/resolvers/zod"
+import { getPresignedUrl } from "@/app/actions"
 import { ArrowLeft, ChevronRight } from "lucide-react"
 import { workDetailsFormSchema, type WorkDetailsFormValues } from "@/lib/schema"
 
 interface WorkDetailsFormProps {
-  onNext: (values: WorkDetailsFormValues) => void
+  onNext: (values: WorkDetailsFormValues & { entranceMapUrl?: string }) => void
   onBack: () => void
   defaultValues?: Partial<WorkDetailsFormValues>
+  storeName: string
 }
 
 const parkingOptions = [
@@ -28,7 +30,7 @@ const parkingOptions = [
   { value: "other", label: "その他" },
 ]
 
-export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFormProps) {
+export function WorkDetailsForm({ onNext, onBack, defaultValues, storeName }: WorkDetailsFormProps) {
   const form = useForm<WorkDetailsFormValues>({
     resolver: zodResolver(workDetailsFormSchema),
     defaultValues: defaultValues || {
@@ -45,6 +47,31 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
   })
 
   const [entranceMapPreview, setEntranceMapPreview] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState("")
+
+  const uploadToS3 = async (file: File): Promise<string> => {
+    const { uploadUrl, key } = await getPresignedUrl("entrance_map" as any, storeName, file.type)
+    await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } })
+    return key
+  }
+
+  const handleSubmit = async (values: WorkDetailsFormValues) => {
+    try {
+      setIsUploading(true)
+      setError("")
+      let entranceMapUrl: string | undefined
+      if (values.entranceMapFile) {
+        entranceMapUrl = await uploadToS3(values.entranceMapFile as File)
+      }
+      onNext({ ...values, entranceMapUrl })
+    } catch (e) {
+      console.error("Error uploading entrance map:", e)
+      setError("入館地図のアップロードに失敗しました")
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   return (
     <Card className="w-full">
@@ -55,7 +82,7 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
         </CardDescription>
       </CardHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onNext)}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <CardContent className="space-y-6 pt-6">
             <FormField
               control={form.control}
@@ -266,7 +293,7 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
                   {field.value && !entranceMapPreview && (
                     <p className="text-sm text-muted-foreground mt-1">選択中のファイル: {field.value.name}</p>
                   )}
-                   {field.value && entranceMapPreview && (
+                  {field.value && entranceMapPreview && (
                     <p className="text-sm text-muted-foreground mt-1">選択中のファイル: {field.value.name}</p>
                   )}
                   <FormMessage />
@@ -308,11 +335,11 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
                 <FormItem>
                   <FormLabel className="text-base font-medium">その他留意事項</FormLabel>
                   <FormDescription>
-                  予めお伝えしておく必要があることがあれば、ご教示ください。<br />
-                  例）・天井裏配線だと、申請に大幅な時間がかかる可能性がある<br />
-                  　  ・高所作業の場合は、資格の提示が必要<br />
-                  　  ・新設で穴あけ作業がある場合、アスベストの調査等も必要となる<br />
-                  　  ・駐車場から荷捌き上まで距離がある<br />
+                    予めお伝えしておく必要があることがあれば、ご教示ください。<br />
+                    例）・天井裏配線だと、申請に大幅な時間がかかる可能性がある<br />
+                    　  ・高所作業の場合は、資格の提示が必要<br />
+                    　  ・新設で穴あけ作業がある場合、アスベストの調査等も必要となる<br />
+                    　  ・駐車場から荷捌き上まで距離がある<br />
                   </FormDescription>
                   <FormControl>
                     <Textarea {...field} className="min-h-[100px]" placeholder="回答を入力" />
@@ -327,8 +354,12 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues }: WorkDetailsFo
               <ArrowLeft className="mr-2 h-4 w-4" />
               戻る
             </Button>
-            <Button type="submit">
-              次へ <ChevronRight className="ml-2 h-4 w-4" />
+            <Button type="submit" disabled={isUploading}>
+              {isUploading ? (
+                "送信中..."
+              ) : (
+                <>次へ <ChevronRight className="ml-2 h-4 w-4" /></>
+              )}
             </Button>
           </CardFooter>
         </form>

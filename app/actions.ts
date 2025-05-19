@@ -28,6 +28,7 @@ const FILE_NAMES = {
   other: "その他書類",
   // 入館説明用資���
   facility_document: "入館説明用の添付ファイル",
+  entrance_map: "入館地図",
 } as const
 
 type UploadUrlResponse = {
@@ -85,4 +86,3 @@ export async function submitSurvey(formData: FormData) {
     }
   }
 }
-

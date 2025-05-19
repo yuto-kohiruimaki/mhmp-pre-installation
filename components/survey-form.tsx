@@ -127,7 +127,7 @@ export default function SurveyForm() {
   }
 
   // 作業詳細フォームの送信処理
-  function handleWorkDetailsSubmit(values: WorkDetailsFormValues) {
+  function handleWorkDetailsSubmit(values: WorkDetailsFormValues & { entranceMapUrl?: string }) {
     setFormData((prev) => ({
       ...prev,
       parkingOption: values.parkingOption,
@@ -139,6 +139,7 @@ export default function SurveyForm() {
       backyardKeyManagement: values.backyardKeyManagement,
       serverRackKeyManagement: values.serverRackKeyManagement,
       otherConsiderations: values.otherConsiderations,
+      entranceMapUrl: values.entranceMapUrl,
     }))
     setCurrentStep(FormStep.CONFIRMATION)
   }
@@ -303,6 +304,7 @@ export default function SurveyForm() {
           }}
           onNext={handleWorkDetailsSubmit}
           onBack={handleBack}
+          storeName={formData.storeName}
         />
       )
 

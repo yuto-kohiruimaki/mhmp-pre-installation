@@ -27,7 +27,8 @@ export type FormData = {
   entryProcedures?: string
   loadingProcedures?: string
   facilityDocumentUrl?: string
-
+  entranceMapUrl?: string
+  
   // 作業詳細情報
   parkingOption?: string
   parkingOptionOther?: string // その他の場合の詳細
