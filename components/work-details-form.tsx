@@ -232,7 +232,7 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues, storeName }: Wo
                       自動消灯の場合の解除方法
                     </FormLabel>
                     <FormDescription>
-                      自動消灯時にどのように解除が可能か、わかる範囲でお教えください。自動消灯がない場合、なしとご記入ください。
+                      自動消灯時にどのように解除が可能か、分かる範囲でお教えください。解除ができない場合はその旨をご記入ください。
                     </FormDescription>
                     <FormControl>
                       <Textarea {...field} className="min-h-[100px]" placeholder="回答を入力" />
