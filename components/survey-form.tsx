@@ -36,7 +36,6 @@ export default function SurveyForm() {
     storeName: "",
     phoneNumber: "",
     businessHours: "",
-    needsDirectCommunication: "",
     managerName: "",
     managerPhone: "",
     photoUrls: {} as Record<string, string>,
@@ -62,15 +61,10 @@ export default function SurveyForm() {
       storeName: values.storeName,
       phoneNumber: values.phoneNumber,
       businessHours: values.businessHours,
-      needsDirectCommunication: values.needsDirectCommunication,
     }))
 
-    // 直接やり取りが必要な場合は施設担当者フォームへ、そうでなければ写真アップロードへ
-    if (values.needsDirectCommunication === "yes") {
-      setCurrentStep(FormStep.FACILITY_MANAGER)
-    } else {
-      setCurrentStep(FormStep.PHOTO_UPLOAD)
-    }
+    // 初期フォームの後は施設担当者フォームへ進む
+    setCurrentStep(FormStep.FACILITY_MANAGER)
   }
 
   // 施設担当者フォームの送信処理
@@ -160,11 +154,7 @@ export default function SurveyForm() {
         setCurrentStep(FormStep.PHOTO_UPLOAD)
         break
       case FormStep.PHOTO_UPLOAD:
-        if (formData.needsDirectCommunication === "yes") {
-          setCurrentStep(FormStep.FACILITY_MANAGER)
-        } else {
-          setCurrentStep(FormStep.INITIAL)
-        }
+        setCurrentStep(FormStep.FACILITY_MANAGER)
         break
       case FormStep.FACILITY_MANAGER:
         setCurrentStep(FormStep.INITIAL)
@@ -202,7 +192,6 @@ export default function SurveyForm() {
       storeName: "",
       phoneNumber: "",
       businessHours: "",
-      needsDirectCommunication: "",
       managerName: "",
       managerPhone: "",
       photoUrls: {} as Record<string, string>,
@@ -229,7 +218,6 @@ export default function SurveyForm() {
             storeName: formData.storeName,
             phoneNumber: formData.phoneNumber,
             businessHours: formData.businessHours,
-            needsDirectCommunication: formData.needsDirectCommunication as "yes" | "no",
           }}
           onSubmit={handleInitialSubmit}
         />

@@ -10,9 +10,6 @@ export const initialFormSchema = z.object({
     .min(1, { message: "電話番号を入力してください" })
     .regex(PHONE_PATTERN, { message: "電話番号は数字とハイフンのみ入力可能です" }),
   businessHours: z.string().min(1, { message: "営業時間を入力してください" }), // 営業時間
-  needsDirectCommunication: z.enum(["yes", "no"], {
-    required_error: "選択してください",
-  }),
 })
 
 export const facilityManagerFormSchema = z.object({

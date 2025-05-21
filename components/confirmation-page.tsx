@@ -93,33 +93,32 @@ export function ConfirmationPage({ formData, onBack, onSubmit, isSubmitting }: C
                 <p className="text-sm text-muted-foreground">店舗電話番号</p>
                 <p className="text-base">{formData.phoneNumber}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  工事作業申請の対応に防災や施設管理と直接やり取りする必要があるか？
-                </p>
-                <p className="text-base">{formData.needsDirectCommunication === "yes" ? "はい" : "いいえ"}</p>
-              </div>
             </div>
           </div>
 
-          {formData.needsDirectCommunication === "yes" && (
-            <>
-              <Separator />
+          {/* 施設ご担当者様情報 */}
+          <Separator />
+          <div>
+            <h3 className="text-lg font-semibold mb-4">施設ご担当者様情報</h3>
+            <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold mb-4">施設ご担当者様情報</h3>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">担当者様のお名前</p>
-                    <p className="text-base">{formData.managerName}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">担当者様の電話番号</p>
-                    <p className="text-base">{formData.managerPhone}</p>
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground">施設担当者様のお名前</p>
+                <p className="text-base">{formData.managerName}</p>
               </div>
-            </>
-          )}
+              <div>
+                <p className="text-sm text-muted-foreground">施設担当者様の電話番号</p>
+                <p className="text-base">{formData.managerPhone}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">防災センター名</p>
+                <p className="text-base">{formData.disasterPreventionCenterName}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">防災センターの電話番号</p>
+                <p className="text-base">{formData.disasterPreventionCenterPhone}</p>
+              </div>
+            </div>
+          </div>
 
           {/* 写真アップロード情報 */}
           {Object.keys(photoUrls).length > 0 && (

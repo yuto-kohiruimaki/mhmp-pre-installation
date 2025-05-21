@@ -2,7 +2,6 @@ export type FormData = {
   storeName: string
   phoneNumber: string
   businessHours: string // added businessHours to FormData
-  needsDirectCommunication: string
   managerName: string
   managerPhone: string
   storeContactName: string
@@ -45,7 +44,6 @@ export type InitialFormData = {
   storeName: string
   phoneNumber: string
   businessHours: string // 営業時間
-  needsDirectCommunication: "yes" | "no"
 }
 
 export type FacilityManagerFormData = {
