@@ -31,6 +31,7 @@ export type FormData = {
   // 作業詳細情報
   parkingOption?: string
   parkingOptionOther?: string // その他の場合の詳細
+  parkingDetails?: string // 作業用駐車場の詳細
   nightTimeRestriction?: string
   restrictionDetails?: string
   autoLightOff?: string

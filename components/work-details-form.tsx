@@ -35,6 +35,8 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues, storeName }: Wo
     resolver: zodResolver(workDetailsFormSchema),
     defaultValues: defaultValues || {
       parkingOption: undefined,
+      parkingOptionOther: "",
+      parkingDetails: "",
       nightTimeRestriction: undefined,
       restrictionDetails: "",
       autoLightOff: undefined,
@@ -127,6 +129,31 @@ export function WorkDetailsForm({ onNext, onBack, defaultValues, storeName }: Wo
                     </FormLabel>
                     <FormControl>
                       <Textarea {...field} placeholder="詳細を入力してください" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {form.watch("parkingOption") === "dedicated" && (
+              <FormField
+                control={form.control}
+                name="parkingDetails"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">
+                      作業用駐車場の詳細 <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormDescription>
+                      作業用駐車場有りの場合、簡単にどこにあるかも含めてご記入ください。
+                    </FormDescription>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="例: 搬入場の付近にあり、お客様駐車場のE駐車場を使用" 
+                        className="min-h-[100px]"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

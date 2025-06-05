@@ -126,6 +126,7 @@ export default function SurveyForm() {
       ...prev,
       parkingOption: values.parkingOption,
       parkingOptionOther: values.parkingOptionOther,
+      parkingDetails: values.parkingDetails,
       nightTimeRestriction: values.nightTimeRestriction,
       restrictionDetails: values.restrictionDetails,
       autoLightOff: values.autoLightOff,
@@ -282,6 +283,7 @@ export default function SurveyForm() {
           defaultValues={{
             parkingOption: formData.parkingOption as any,
             parkingOptionOther: formData.parkingOptionOther,
+            parkingDetails: formData.parkingDetails,
             nightTimeRestriction: formData.nightTimeRestriction as "yes" | "no",
             restrictionDetails: formData.restrictionDetails,
             autoLightOff: formData.autoLightOff as "yes" | "no",

@@ -207,7 +207,13 @@ export async function appendToSheet(formData: FormData) {
       [QUESTIONS[31]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
       [QUESTIONS[32]]: formData.entranceMapUrl ? `${s3BaseUrl}/${formData.entranceMapUrl}` : "-",
       [QUESTIONS[33]]: formData.parkingOption
-        ? parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption
+        ? (() => {
+            const baseLabel = parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption;
+            if (formData.parkingOption === "dedicated" && formData.parkingDetails) {
+              return `${baseLabel}: ${formData.parkingDetails}`;
+            }
+            return baseLabel;
+          })()
         : "-",
       [QUESTIONS[34]]: formData.parkingOptionOther || "-", // その他の詳細
       [QUESTIONS[35]]:

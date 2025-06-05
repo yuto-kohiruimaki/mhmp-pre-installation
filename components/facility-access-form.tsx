@@ -108,7 +108,8 @@ export function FacilityAccessForm({ onNext, onBack, defaultValues, storeName }:
                     入館時の遵守事項 <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormDescription>
-                    入館方法、駐車場から入館までのルート店舗へ入店する際に必要な鍵やその在処/明け方についてもご教示ください。営業終了後の作業となることが多くなるため、当日お電話で確認することが難しく、入店自体ができない場合、作業ができなくなってしまいます。
+                    入館方法、駐車場から入館までのルート店舗へ入店する際に必要な鍵やその在処/明け方についてもご教示ください。営業終了後の作業となることが多くなるため、当日お電話で確認することが難しく、入店自体ができない場合、作業ができなくなってしまいます。<br />
+                    路面店等、店舗への入店に鍵が必要な場合は、その入店方法（鍵のありか含む）もご記載ください
                   </FormDescription>
                   <FormControl>
                     <Textarea {...field} className="min-h-[100px]" placeholder="回答を入力" />

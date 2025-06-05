@@ -64,6 +64,7 @@ export const workDetailsFormSchema = z.object({
     required_error: "選択してください",
   }),
   parkingOptionOther: z.string().optional(),
+  parkingDetails: z.string().optional(),
   nightTimeRestriction: z.enum(["yes", "no"], {
     required_error: "選択してください",
   }),
