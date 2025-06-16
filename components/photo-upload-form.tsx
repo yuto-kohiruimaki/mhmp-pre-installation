@@ -97,9 +97,9 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      setError("ファイルサイズは10MB以下にしてください。")
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
+      setError("ファイルサイズは50MB以下にしてください。")
       return
     }
 
@@ -146,13 +146,27 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
 
     try {
       const photoUrls: Record<string, string> = {}
+      const uploadPromises: Promise<void>[] = []
 
-      // 各写真をS3にアップロード
+      // 各写真をS3にアップロード（並列処理）
       for (const photo of photos) {
         if (photo.file) {
-          const key = await uploadToS3(photo.file, photo.id)
-          photoUrls[photo.id] = key
+          const uploadPromise = uploadToS3(photo.file, photo.id).then((key) => {
+            photoUrls[photo.id] = key
+          })
+          uploadPromises.push(uploadPromise)
         }
+      }
+
+      // 全てのアップロードが完了するまで待機
+      await Promise.all(uploadPromises)
+
+      // 全ての写真のアップロードが成功した場合のみ次に進む
+      const expectedPhotoCount = photos.filter(p => p.file).length
+      const actualUploadCount = Object.keys(photoUrls).length
+
+      if (expectedPhotoCount !== actualUploadCount) {
+        throw new Error("一部の写真のアップロードに失敗しました。再度お試しください。")
       }
 
       onNext(photoUrls) // Reverted to pass only photoUrls
@@ -168,7 +182,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
       <CardHeader className="bg-primary pb-4">
         <CardTitle className="text-white text-xl">写真のアップロード</CardTitle>
         <CardDescription className="text-primary-foreground/90">
-          必要な写真をアップロードしてください。各写真のサイズは10MB以下にしてください。
+          必要な写真をアップロードしてください。各写真のサイズは50MB以下にしてください。
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">

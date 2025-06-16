@@ -70,9 +70,9 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      setError("ファイルサイズは10MB以下にしてください。")
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
+      setError("ファイルサイズは50MB以下にしてください。")
       return
     }
 
@@ -124,11 +124,25 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
 
     try {
       const documentUrls: Record<string, string> = {}
+      const uploadPromises: Promise<void>[] = []
 
-      // 各書類をS3にアップロード
+      // 各書類をS3にアップロード（並列処理）
       for (const [key, file] of Object.entries(documents)) {
-        const s3Key = await uploadToS3(file, key)
-        documentUrls[key] = s3Key
+        const uploadPromise = uploadToS3(file, key).then((s3Key) => {
+          documentUrls[key] = s3Key
+        })
+        uploadPromises.push(uploadPromise)
+      }
+
+      // 全てのアップロードが完了するまで待機
+      await Promise.all(uploadPromises)
+
+      // 全ての書類のアップロードが成功した場合のみ次に進む
+      const expectedDocumentCount = Object.keys(documents).length
+      const actualUploadCount = Object.keys(documentUrls).length
+
+      if (expectedDocumentCount !== actualUploadCount) {
+        throw new Error("一部の書類のアップロードに失敗しました。再度お試しください。")
       }
 
       onNext({

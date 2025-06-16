@@ -37,9 +37,9 @@ export function FacilityAccessForm({ onNext, onBack, defaultValues, storeName }:
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      setError("ファイルサイズは10MB以下にしてください。")
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
+      setError("ファイルサイズは50MB以下にしてください。")
       return
     }
 
@@ -74,7 +74,13 @@ export function FacilityAccessForm({ onNext, onBack, defaultValues, storeName }:
       let documentUrl: string | undefined
 
       if (selectedFile) {
+        // S3アップロードの完了を確実に待機
         documentUrl = await uploadToS3(selectedFile)
+        
+        // アップロードが成功したかを確認
+        if (!documentUrl) {
+          throw new Error("ファイルのアップロードに失敗しました。再度お試しください。")
+        }
       }
 
       onNext({
