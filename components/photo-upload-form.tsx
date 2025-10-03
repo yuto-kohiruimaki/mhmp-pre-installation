@@ -218,7 +218,7 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
           {photos.map((photo) => (
             <div key={photo.id} className="space-y-2">
               <h3 className="text-lg font-semibold">{photo.title}</h3>
-              <p className="text-sm text-muted-foreground">{photo.description}</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-line">{photo.description}</p>
 
               {/* サンプル画像がある場合は表示 */}
               {photo.exampleImage && (
