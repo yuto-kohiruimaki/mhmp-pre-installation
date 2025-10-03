@@ -40,7 +40,7 @@ const REQUIRED_PHOTOS: PhotoUpload[] = [
     id: "left",
     title: "工事場所の写真撮影（店舗の奥左から見た写真）",
     description: "入り口側左右でなく、店舗の奥角から天井と入り口通路が見える形で撮影をお願いします。\n※写真の点検口の位置も見たいのでこれらが写るようにしていただきたいです。",
-    exampleImage: "/inspection-port.png",
+    exampleImage: "/inspection-port-back-left.png",
     file: null,
     preview: null,
   },
@@ -48,7 +48,7 @@ const REQUIRED_PHOTOS: PhotoUpload[] = [
     id: "right",
     title: "工事場所の写真撮影（店舗の奥右から見た写真）",
     description: "入り口側左右でなく、店舗の奥角から天井と入り口通路が見える形で撮影をお願いします。\n※写真の点検口の位置も見たいのでこれらが写るようにしていただきたいです。",
-    exampleImage: "/inspection-port.png",
+    exampleImage: "/inspection-port-back-right.png",
     file: null,
     preview: null,
   },
@@ -197,17 +197,17 @@ export function PhotoUploadForm({ onNext, onBack, storeName }: PhotoUploadFormPr
                   <img
                     src={photo.exampleImage || "/placeholder.svg"}
                     alt="サーバーラック内の参考画像"
-                    className="object-cover w-[50%] block"
+                    className="object-cover w-[80%] mx-auto block"
                   />
               )}
               {/* サンプル画像2がある場合は表示 */}
               {photo.id === "server" && photo.exampleImage2 && (
                 <div className="mt-2">
-                  <p className="text-sm text-muted-foreground mb-1">※サーバーラックのイメージ</p>
+                  <p className="text-sm text-muted-foreground mb-1 text-center">※サーバーラックのイメージ</p>
                   <img
                     src={photo.exampleImage2}
                     alt="サーバーラックのイメージ"
-                    className="object-cover w-[50%] block"
+                    className="object-cover w-[80%] mx-auto block"
                   />
                 </div>
               )}
