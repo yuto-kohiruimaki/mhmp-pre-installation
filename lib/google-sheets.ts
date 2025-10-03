@@ -14,9 +14,12 @@ const QUESTIONS: string[] = [
   "防災センターご連絡先_お名前",
   "防災センターご連絡先_電話番号",
   "店舗外観_正面",
-  "店舗外観_左",
-  "店舗外観_右",
-  "店舗内観_天井",
+  "店舗外観_向かって右",
+  "店舗外観_向かって左",
+  "店舗内観_奥左",
+  "店舗内観_奥右",
+  "店舗の入り口から真横左からの写真",
+  "店舗の入り口から真横右からの写真",
   "バックヤード全体",
   "サーバーラック内",
   // 工事申請情報
@@ -176,37 +179,40 @@ export async function appendToSheet(formData: FormData) {
       [QUESTIONS[7]]: formData.disasterPreventionCenterName || "-",
       [QUESTIONS[8]]: formData.disasterPreventionCenterPhone || "-",
       [QUESTIONS[9]]: photoFullUrls.front || "-",
-      [QUESTIONS[10]]: photoFullUrls.left || "-",
-      [QUESTIONS[11]]: photoFullUrls.right || "-",
-      [QUESTIONS[12]]: photoFullUrls.ceiling || "-",
-      [QUESTIONS[13]]: photoFullUrls.backyard || "-",
-      [QUESTIONS[14]]: photoFullUrls.server || "-",
+      [QUESTIONS[10]]: photoFullUrls["outside-right"] || "-",
+      [QUESTIONS[11]]: photoFullUrls["outside-left"] || "-",
+      [QUESTIONS[12]]: photoFullUrls.left || "-",
+      [QUESTIONS[13]]: photoFullUrls.right || "-",
+      [QUESTIONS[14]]: photoFullUrls["left-side"] || "-",
+      [QUESTIONS[15]]: photoFullUrls["right-side"] || "-",
+      [QUESTIONS[16]]: photoFullUrls.backyard || "-",
+      [QUESTIONS[17]]: photoFullUrls.server || "-",
       // 工事申請情報
-      [QUESTIONS[15]]: formData.unavailableDates || "-",
-      [QUESTIONS[16]]: formData.constructionPossibility
+      [QUESTIONS[18]]: formData.unavailableDates || "-",
+      [QUESTIONS[19]]: formData.constructionPossibility
         ? constructionPossibilityLabels[formData.constructionPossibility]
         : "-",
-      [QUESTIONS[17]]: formData.constructionPossibilityOther || "-", // その他の詳細
-      [QUESTIONS[18]]: formData.requiredDocuments
+      [QUESTIONS[20]]: formData.constructionPossibilityOther || "-", // その他の詳細
+      [QUESTIONS[21]]: formData.requiredDocuments
         ? JSON.stringify(formData.requiredDocuments.map((doc) => documentLabels[doc] || doc))
         : "-",
-      [QUESTIONS[19]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
-      [QUESTIONS[20]]: formData.faxNumber || "-",
-      [QUESTIONS[21]]: formData.emailAddress || "-",
-      [QUESTIONS[22]]: formData.otherSubmissionDetails || "-", // その他の詳細
+      [QUESTIONS[22]]: formData.submissionMethod ? submissionMethodLabels[formData.submissionMethod] : "-",
+      [QUESTIONS[23]]: formData.faxNumber || "-",
+      [QUESTIONS[24]]: formData.emailAddress || "-",
+      [QUESTIONS[25]]: formData.otherSubmissionDetails || "-", // その他の詳細
       // 作業申請の際のお約束を2つに分割
-      [QUESTIONS[23]]: formData.requiredItems || "-",
-      [QUESTIONS[24]]: formData.applicationDeadline || "-",
+      [QUESTIONS[26]]: formData.requiredItems || "-",
+      [QUESTIONS[27]]: formData.applicationDeadline || "-",
       // 工事書類を4つの別々の列に分ける
-      [QUESTIONS[25]]: constructionDocumentUrls.construction || "-",
-      [QUESTIONS[26]]: constructionDocumentUrls.fire || "-",
-      [QUESTIONS[27]]: constructionDocumentUrls.facility || "-",
-      [QUESTIONS[28]]: constructionDocumentUrls.other || "-",
-      [QUESTIONS[29]]: formData.entryProcedures || "-",
-      [QUESTIONS[30]]: formData.loadingProcedures || "-",
-      [QUESTIONS[31]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
-      [QUESTIONS[32]]: formData.entranceMapUrl ? `${s3BaseUrl}/${formData.entranceMapUrl}` : "-",
-      [QUESTIONS[33]]: formData.parkingOption
+      [QUESTIONS[28]]: constructionDocumentUrls.construction || "-",
+      [QUESTIONS[29]]: constructionDocumentUrls.fire || "-",
+      [QUESTIONS[30]]: constructionDocumentUrls.facility || "-",
+      [QUESTIONS[31]]: constructionDocumentUrls.other || "-",
+      [QUESTIONS[32]]: formData.entryProcedures || "-",
+      [QUESTIONS[33]]: formData.loadingProcedures || "-",
+      [QUESTIONS[34]]: formData.facilityDocumentUrl ? `${s3BaseUrl}/${formData.facilityDocumentUrl}` : "-",
+      [QUESTIONS[35]]: formData.entranceMapUrl ? `${s3BaseUrl}/${formData.entranceMapUrl}` : "-",
+      [QUESTIONS[36]]: formData.parkingOption
         ? (() => {
             const baseLabel = parkingOptionLabels[formData.parkingOption as keyof typeof parkingOptionLabels] || formData.parkingOption;
             if (formData.parkingOption === "dedicated" && formData.parkingDetails) {
@@ -215,17 +221,17 @@ export async function appendToSheet(formData: FormData) {
             return baseLabel;
           })()
         : "-",
-      [QUESTIONS[34]]: formData.parkingOptionOther || "-", // その他の詳細
-      [QUESTIONS[35]]:
+      [QUESTIONS[37]]: formData.parkingOptionOther || "-", // その他の詳細
+      [QUESTIONS[38]]:
         formData.nightTimeRestriction === "yes" ? "ある" : formData.nightTimeRestriction === "no" ? "ない" : "-",
-      [QUESTIONS[36]]: formData.restrictionDetails || "-",
-      [QUESTIONS[37]]:
+      [QUESTIONS[39]]: formData.restrictionDetails || "-",
+      [QUESTIONS[40]]:
         formData.autoLightOff === "yes" ? "自動消灯" : formData.autoLightOff === "no" ? "自動消灯なし" : "-",
-      [QUESTIONS[38]]: formData.lightOffDetails || "-",
-      [QUESTIONS[39]]: formData.backyardKeyManagement || "-",
-      [QUESTIONS[40]]: formData.serverRackKeyManagement || "-",
-      [QUESTIONS[41]]: formData.otherConsiderations || "-",
-      [QUESTIONS[42]]: formattedJapanTime, // 送信日時（日本時間）を追加
+      [QUESTIONS[41]]: formData.lightOffDetails || "-",
+      [QUESTIONS[42]]: formData.backyardKeyManagement || "-",
+      [QUESTIONS[43]]: formData.serverRackKeyManagement || "-",
+      [QUESTIONS[44]]: formData.otherConsiderations || "-",
+      [QUESTIONS[45]]: formattedJapanTime, // 送信日時（日本時間）を追加
     }
 
     // Add the new row

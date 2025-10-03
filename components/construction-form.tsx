@@ -469,7 +469,8 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
                     作業申請の締め切り <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormDescription>
-                    作業申請の締め切りを記載をお願いいたします。夜間警備発生時の締め切りもいただけると助かります。
+                    作業申請の締め切りを記載をお願いいたします。夜間警備発生時の締め切りもいただけると助かります。<br />
+                    夜間警備含めると提出期限が早まる場合は、そちらの期限を記載お願いします。
                   </FormDescription>
                   <FormControl>
                     <Textarea
@@ -513,4 +514,3 @@ export function ConstructionForm({ onNext, onBack, defaultValues, storeName }: C
     </Card>
   )
 }
-

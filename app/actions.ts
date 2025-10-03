@@ -16,9 +16,12 @@ const s3Client = new S3Client({
 // ファイル名のマッピング（設問項目に合わせる）
 const FILE_NAMES = {
   front: "店舗外観_正面",
-  left: "店舗外観_左",
-  right: "店舗外観_右",
-  ceiling: "店舗内観_天井",
+  "outside-right": "店舗外観_向かって右",
+  "outside-left": "店舗外観_向かって左",
+  left: "店舗内観_奥左",
+  right: "店舗内観_奥右",
+  "left-side": "店舗の入り口から真横左",
+  "right-side": "店舗の入り口から真横右",
   backyard: "バックヤード全体",
   server: "サーバーラック内",
   // 工事書類
