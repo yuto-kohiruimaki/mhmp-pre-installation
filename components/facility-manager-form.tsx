@@ -85,7 +85,7 @@ export function FacilityManagerForm({ defaultValues, onSubmit, onBack }: Facilit
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-lg font-medium">店舗窓口</h3>
+              <h3 className="text-lg font-medium">保険見直し本舗担当者窓口</h3>
               <p className="text-sm text-muted-foreground">
                 入店時の不明点についてやりとりさせていただく方のご連絡先をご記入ください。
               </p>
